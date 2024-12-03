@@ -1,71 +1,56 @@
-// export default async function handler(req, res) {
-//     const { method, body } = req; 
-//     const API_URL = `${process.env.NEXT_PUBLIC_FLASK_APIKEY}/upload`;
+import { NextResponse } from 'next/server';
+
+export async function GET(request) {
+  const { pathname, searchParams } = new URL(request.url);
   
-//     try {
-//       const response = await fetch(API_URL, {
-//         method,
-//         headers: {
-//             ...(method !== 'POST' && { 'Content-Type': req.headers['content-type'] || 'application/json' }),
-//         },
-//         body: method === 'POST' ? body : undefined, 
-//       });
+  const target = process.env.NEXT_PUBLIC_FLASK_APIKEY?.replace('https://', 'http://');
   
-//       const data = await response.json(); 
-//       res.status(response.status).json(data); 
-//     } catch (error) {
-//       console.error("Error calling the API:", error);
-//       res.status(500).json({ error: "Failed to connect to the API." });
-//     }
-//   }
-
-import https from "https";
-
-export default async function handler(req, res) {
-  const { method, body } = req;
-
-  const API_HOST = process.env.NEXT_PUBLIC_FLASK_API_HOST;
-  const API_PORT = process.env.NEXT_PUBLIC_FLASK_API_PORT;
-
-  const options = {
-    hostname: API_HOST, 
-    port: API_PORT,     
-    path: '/upload',    
-    method: method,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
-
-
-  const proxy = https.request(options, (response) => {
-    let data = '';
-
- 
-    response.on('data', (chunk) => {
-      data += chunk;
-    });
-
-
-    response.on('end', () => {
-      try {
-        res.status(response.statusCode).json(JSON.parse(data));
-      } catch (error) {
-        res.status(500).json({ error: "Invalid JSON response from server." });
-      }
-    });
-  });
-
-
-  proxy.on('error', (err) => {
-    console.error('Proxy error:', err);
-    res.status(500).json({ error: err.message });
-  });
-
-
-  if (body) {
-    proxy.write(JSON.stringify(body));
+  if (!target) {
+    return new NextResponse('API URL not configured', { status: 500 });
   }
 
-  proxy.end();
+  try {
+    const queryString = Array.from(searchParams.entries())
+      .map(([key, value]) => `${key}=${value}`)
+      .join('&');
+      
+    const apiUrl = `${target}${pathname.replace('/api', '')}${queryString ? `?${queryString}` : ''}`;
+    
+    const response = await fetch(apiUrl, {
+      method: request.method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('Proxy error:', error);
+    return new NextResponse('Proxy error', { status: 500 });
+  }
+}
+
+export async function POST(request) {
+  const target = process.env.NEXT_PUBLIC_FLASK_APIKEY?.replace('https://', 'http://');
+  
+  if (!target) {
+    return new NextResponse('API URL not configured', { status: 500 });
+  }
+
+  try {
+    const body = await request.blob();
+    const apiUrl = `${target}/upload`; 
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      body: body,
+    });
+
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('Proxy error:', error);
+    return new NextResponse('Proxy error', { status: 500 });
+  }
 }

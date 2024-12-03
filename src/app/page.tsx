@@ -132,10 +132,10 @@ const Preview = () => {
       formData.append('image', blob, 'captured_image.jpg');
       formData.append('emotion', selectedEmotion || '');
 
-      const uploadResponse = await fetch('/api/proxy', {
+      const apiUrl = '/api/upload';
+      const uploadResponse = await fetch(apiUrl, {
         method: 'POST',
         body: formData,
-        mode: 'cors',
       });
 
       if (!uploadResponse.ok) {
