@@ -132,16 +132,10 @@ const Preview = () => {
       formData.append('image', blob, 'captured_image.jpg');
       formData.append('emotion', selectedEmotion || '');
 
-      // const apiUrl = `${process.env.NEXT_PUBLIC_FLASK_APIKEY}/upload`;
-      // const uploadResponse = await fetch(apiUrl, {
-      //   method: 'POST',
-      //   body: formData,
-      //   mode: 'cors',
-      // });
-
       const uploadResponse = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
+
       });
 
       if (!uploadResponse.ok) {
@@ -193,7 +187,7 @@ const Preview = () => {
             </div>
 
             <div className="flex-grow">
-              <h2 className="text-2xl font-semibold mb-4">감정 선택</h2>
+              <h2 className="text-2xl font-semibold mb-4 text-black">감정 선택</h2>
               <div className="grid grid-cols-4 lg:grid-cols-2 gap-2 md:gap-4">
                 {emotions.map((emotion) => (
                   <button
@@ -217,7 +211,7 @@ const Preview = () => {
             {selectedEmotion ? (
               <>
                 <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
-                  <p className="text-xl md:text-2xl mb-3">
+                  <p className="text-xl md:text-2xl mb-3 text-black">
                     {getEmoticonForEmotion(selectedEmotion)} {selectedEmotion}을 찍어 보세요!
                   </p>
                   <div className="h-[300px] md:h-[400px] bg-gray-200 rounded-xl overflow-hidden mb-3 flex items-center justify-center">
@@ -259,7 +253,7 @@ const Preview = () => {
                 </div>
 
                 <div className="text-center mt-6 md:mt-10">
-                  <h2 className="text-xl md:text-2xl font-semibold">표정 분석 결과</h2>
+                  <h2 className="text-xl md:text-2xl font-semibold text-black">표정 분석 결과</h2>
                   {isLoading ? (
                     <div className="text-blue-600">분석중...</div>
                   ) : error ? (
