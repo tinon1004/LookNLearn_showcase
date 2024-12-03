@@ -132,13 +132,23 @@ const Preview = () => {
       formData.append('image', blob, 'captured_image.jpg');
       formData.append('emotion', selectedEmotion || '');
 
+      console.log('Sending request...');
+
       const uploadResponse = await fetch('/api/upload', {
         method: 'POST',
-        body: formData
+        body: formData,
+        headers: {
+          'Accept': 'application/json',
+        }
       });
 
+      console.log('Response received:', uploadResponse.status);
+
       if (!uploadResponse.ok) {
-        throw new Error('다시 시도해 주세요');
+        const errorText = await uploadResponse.text();
+        console.error('Server error response:', errorText); 
+        throw new Error(`서버 응답 오류: ${uploadResponse.status}`);
+        //throw new Error('다시 시도해 주세요');
       }
 
       const data: PredictionResponse = await uploadResponse.json();
