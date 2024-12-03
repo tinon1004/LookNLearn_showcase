@@ -132,23 +132,20 @@ const Preview = () => {
       formData.append('image', blob, 'captured_image.jpg');
       formData.append('emotion', selectedEmotion || '');
 
-      console.log('Sending request...');
+      // const apiUrl = `${process.env.NEXT_PUBLIC_FLASK_APIKEY}/upload`;
+      // const uploadResponse = await fetch(apiUrl, {
+      //   method: 'POST',
+      //   body: formData,
+      //   mode: 'cors',
+      // });
 
       const uploadResponse = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
-        headers: {
-          'Accept': 'application/json',
-        }
       });
 
-      console.log('Response received:', uploadResponse.status);
-
       if (!uploadResponse.ok) {
-        const errorText = await uploadResponse.text();
-        console.error('Server error response:', errorText); 
-        throw new Error(`서버 응답 오류: ${uploadResponse.status}`);
-        //throw new Error('다시 시도해 주세요');
+        throw new Error('다시 시도해 주세요');
       }
 
       const data: PredictionResponse = await uploadResponse.json();
