@@ -6,7 +6,7 @@ export default async function handler(req, res) {
       const response = await fetch(API_URL, {
         method,
         headers: {
-          'Content-Type': req.headers['content-type'] || 'application/json',
+            ...(method !== 'POST' && { 'Content-Type': req.headers['content-type'] || 'application/json' }),
         },
         body: method === 'POST' ? body : undefined, 
       });
