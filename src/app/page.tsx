@@ -132,8 +132,7 @@ const Preview = () => {
       formData.append('image', blob, 'captured_image.jpg');
       formData.append('emotion', selectedEmotion || '');
 
-      const apiUrl = `${process.env.NEXT_PUBLIC_FLASK_APIKEY}/upload`;
-      const uploadResponse = await fetch(apiUrl, {
+      const uploadResponse = await fetch('/api/proxy', {
         method: 'POST',
         body: formData,
         mode: 'cors',
